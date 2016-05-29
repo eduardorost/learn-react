@@ -1,4 +1,4 @@
-Exemplo desenvolvido para apresentação sobre REACT nas disciplina Arquitetura de Software - UNISINOS
+Exemplo desenvolvido para apresentação sobre REACT na disciplina Arquitetura de Software - UNISINOS
 
 ##Installation
 
