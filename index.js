@@ -1,62 +1,75 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
-var TodoList = React.createClass({
-    displayName: 'TodoList',
-
-    render: function render() {
-        var createItem = function createItem(item) {
-            return React.createElement(
-                'li',
-                { key: item.id },
-                item.text
-            );
-        };
-        return React.createElement(
-            'ul',
-            null,
-            this.props.items.map(createItem)
+class TodoItem extends React.Component {
+    render() {
+        return (
+            <div>{this.props.item}</div>
         );
     }
-});
+}
 
-var TodoApp = React.createClass({
-    displayName: 'TodoApp',
+class TodoList extends React.Component {
+    render() {
+        var items = this.props.items.map((item) => {
+            return (
+                <li>
+                    <TodoItem item={item} />
+                </li>);
+        })
 
-    getInitialState: function getInitialState() {
-        return { items: [], text: '' };
-    },
-    onChange: function onChange(e) {
-        this.setState({ text: e.target.value });
-    },
-    handleSubmit: function handleSubmit(e) {
+        return (
+            <ul>{items}</ul>
+        );
+    }
+}
+
+class TodoForm extends React.Component {
+    constructor(props) {
+        super(props);
+        this.onSubmit = this.onSubmit.bind(this);
+    }
+    componentDidMount() {
+        ReactDOM.findDOMNode(this.refs.itemName).focus();
+    }
+    render() {
+        return (
+            <form onSubmit={this.onSubmit}>
+                <input ref="itemName" type="text" />
+            </form>
+        );
+    }
+    onSubmit(e) {
         e.preventDefault();
-        var nextItems = this.state.items.concat([{ text: this.state.text, id: Date.now() }]);
-        var nextText = '';
-        this.setState({ items: nextItems, text: nextText });
-    },
-    render: function render() {
-        return React.createElement(
-            'div',
-            null,
-            React.createElement(
-                'h3',
-                null,
-                'TODO'
-            ),
-            React.createElement(TodoList, { items: this.state.items }),
-            React.createElement(
-                'form',
-                { onSubmit: this.handleSubmit },
-                React.createElement('input', { onChange: this.onChange, value: this.state.text }),
-                React.createElement(
-                    'button',
-                    null,
-                    'Add #' + (this.state.items.length + 1)
-                )
-            )
+        var input = ReactDOM.findDOMNode(this.refs.itemName);
+        var value = input.value
+        this.props.addEvent({ value });
+        input.value = '';
+    }
+}
+
+class TodoApp extends React.Component {
+    constructor(props) {
+        super(props);
+        this.addEvent = this.addEvent.bind(this);
+        this.state = {
+            items: []
+        }
+    }
+    render() {
+        return (
+            <div>
+                <TodoList items={this.state.items} />
+                <TodoForm addEvent={this.addEvent} />
+            </div>
         );
     }
-});
 
-ReactDOM.render(React.createElement(TodoApp, null), document.getElementById('root'));
+    addEvent(todoItem) {
+        var allItems = this.state.items;
+        allItems.push(todoItem.value);
+        this.setState({ allItems });
+    }
+}
+
+ReactDOM.render(<TodoApp />, document.getElementById('root'));
